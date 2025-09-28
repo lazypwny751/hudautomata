@@ -1,0 +1,18 @@
+# Build artifacts
+/build
+
+# Git
+.git
+.gitignore
+
+# VCS & IDE
+.vscode
+.idea
+*.swp
+
+# Example files
+*.example
+.*.example
+
+# Go mod cache (handled by layer caching via go mod download)
+**/*.log

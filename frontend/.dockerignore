@@ -1,0 +1,16 @@
+# Dependencies
+node_modules
+bun.lockb
+
+# Build outputs
+dist
+build
+
+# Logs
+*.log
+
+# Git & Docker
+.git
+.gitignore
+.dockerignore
+Dockerfile

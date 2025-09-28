@@ -1,38 +1,13 @@
-<html>
-<head>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</head>
-<body>
-    <h1 x-data="{ message: 'I ❤️  Hüda soft' }" x-text="message"></h1>
-
-	<div x-data="{ count: 0 }">
-	    <button x-on:click="count++">Increment</button> 
-	    <span x-text="count"></span>
-	</div>
-
-	<div x-show="open" ...>Contents...</div>
-
-<div
-    x-data="{
-        search: '',
- 
-        items: ['foo', 'bar', 'baz'],
- 
-        get filteredItems() {
-            return this.items.filter(
-                i => i.startsWith(this.search)
-            )
-        }
-    }"
->
-    <input x-model="search" placeholder="Search...">
- 
-    <ul>
-        <template x-for="item in filteredItems" :key="item">
-            <li x-text="item"></li>
-        </template>
-    </ul>
-</div>
-
-</body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

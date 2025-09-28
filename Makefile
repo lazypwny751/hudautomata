@@ -1,22 +1,15 @@
-all: backend-build frontend-build firmware-build
-clean: backend-clean frontend-clean firmware-clean
+PREFIX := build
+OUT := $(PREFIX)/hudautomata
 
-backend-build:
-	@echo "Backend build."
+all: build
 
-backend-clean:
-	@echo "Backend clean."
+build: backend
 
-frontend-build:
-	@echo "Frontend build."
+backend:
+	mkdir -p "$(PREFIX)"
+	go build -o "$(OUT)" "src/main.go"
 
-frontend-clean:
-	@echo "Frontend clean."
+clean:
+	rm -rf $(OUT)
 
-firmware-build:
-	@echo "Firmware build."
-
-firmware-clean:
-	@echo "Firmware clean."
-
-.PHONY: backend-build frontend-build firmware-build
+.PHONY: all build backend clean
