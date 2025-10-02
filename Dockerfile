@@ -24,4 +24,3 @@ EXPOSE 8080
 ENV GIN_MODE=release
 
 ENTRYPOINT ["hudautomata"]
-CMD ["--host", "0.0.0.0", "--port", "8080"]

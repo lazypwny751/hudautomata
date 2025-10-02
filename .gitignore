@@ -1,2 +1,4 @@
 build/
 hudautomata
+*.db
+test-docker.sh

@@ -1,43 +1,63 @@
-import { useState } from 'preact/hooks'
-import preactLogo from './assets/preact.svg'
-import viteLogo from '/vite.svg'
-import './app.css'
+import { Router, Route } from 'preact-router';
+import { useEffect } from 'preact/hooks';
+import { useAuthStore, useUIStore } from './lib/store';
+
+// Pages
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Users from './pages/Users';
+import Transactions from './pages/Transactions';
+import Automation from './pages/Automation';
+
+// Components
+import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
+
+function PrivateRoute({ component: Component, ...rest }) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  
+  if (!isAuthenticated) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+    return null;
+  }
+
+  return <Component {...rest} />;
+}
 
 export function App() {
-  const [count, setCount] = useState(0)
+  const { checkAuth, isAuthenticated } = useAuthStore();
+  const { theme, setTheme } = useUIStore();
+
+  useEffect(() => {
+    // Set initial theme
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    // Check authentication
+    if (isAuthenticated) {
+      checkAuth();
+    }
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} class="logo" alt="Vite logo" />
-        </a>
-        <a href="https://preactjs.com" target="_blank">
-          <img src={preactLogo} class="logo preact" alt="Preact logo" />
-        </a>
+    <div class="min-h-screen">
+      {isAuthenticated && <Navbar />}
+      
+      <div class="flex">
+        {isAuthenticated && <Sidebar />}
+        
+        <main class="flex-1">
+          <Router>
+            <Route path="/login" component={Login} />
+            <PrivateRoute path="/" component={Dashboard} />
+            <PrivateRoute path="/users" component={Users} />
+            <PrivateRoute path="/transactions" component={Transactions} />
+            <PrivateRoute path="/automation" component={Automation} />
+          </Router>
+        </main>
       </div>
-      <h1>Vite + Preact</h1>
-      <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/app.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p>
-        Check out{' '}
-        <a
-          href="https://preactjs.com/guide/v10/getting-started#create-a-vite-powered-preact-app"
-          target="_blank"
-        >
-          create-preact
-        </a>
-        , the official Preact + Vite starter
-      </p>
-      <p class="read-the-docs">
-        Click on the Vite and Preact logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
+

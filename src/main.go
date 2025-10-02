@@ -1,42 +1,55 @@
 package main
 
 import (
-	"time"
-	"flag"
-	"strconv"
+	"log"
 	"net/http"
-	"log/slog"
+	"time"
 
-	"github.com/lazypwny751/hudautomata/pkg/routes"
 	"github.com/gin-gonic/gin"
-)
-
-var (
-	host       = flag.String("host", "127.0.0.1", "Gorgi Chat host")
-	port       = flag.Int("port", 8080, "Gorgi Chat running port")
-	// language   = flag.String("language", "en", "Language for the chat")
-
-	dbHost     = flag.String("db-host", "127.0.0.1", "Database host")
-	dbPort     = flag.Int("db-port", 3306, "Database port")
-	dbUser     = flag.String("db-user", "gorgi", "Database user")
-	dbPassword = flag.String("db-password", "", "Database password")
-	dbName     = flag.String("db-name", "gorgi_chat", "Database name")
+	"github.com/lazypwny751/hudautomata/pkg/config"
+	"github.com/lazypwny751/hudautomata/pkg/database"
+	"github.com/lazypwny751/hudautomata/pkg/routes"
 )
 
 func main() {
+	// Load configuration
+	cfg := config.Load()
+
+	// Set Gin mode
+	gin.SetMode(cfg.Environment)
+
+	// Connect to database
+	if err := database.Connect(); err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	// Seed initial data
+	if err := database.SeedData(); err != nil {
+		log.Printf("Warning: Failed to seed data: %v", err)
+	}
+
+	// Initialize Gin router
 	r := gin.Default()
+
+	// Setup routes
 	routes.SetupRoutes(r)
 
-	s := &http.Server{
-		Addr:         *host + ":" + strconv.Itoa(*port),
+	// Create HTTP server
+	srv := &http.Server{
+		Addr:         cfg.Host + ":" + cfg.Port,
 		Handler:      r,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
-	slog.Info("Starting server at", "url", "http://"+ *host + ":" + strconv.Itoa(*port))
-	if err := s.ListenAndServe(); err != nil {
-		slog.Error("Error starting server: ", "err", err)
-		return
+	// Start server
+	log.Printf("🚀 Server starting on http://%s:%s", cfg.Host, cfg.Port)
+	log.Printf("📊 Environment: %s", cfg.Environment)
+	log.Printf("💾 Database: %s", cfg.DBDriver)
+	
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
+
